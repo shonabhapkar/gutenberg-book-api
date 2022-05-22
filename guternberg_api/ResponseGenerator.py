@@ -1,16 +1,6 @@
 from guternberg_api.DBHelper import DBHelper
 
 
-# class APIResponse:
-#     message: str
-#     code: int
-#     response: {}
-#
-#     def get_response(self):
-#         return {"code": self.code,
-#                 "response": self.response,
-#                 "message": self.message}
-
 class APIResponse:
     def __init__(self, code, response, message):
         self.message = message
@@ -23,13 +13,13 @@ class APIResponse:
                 "message": self.message}
 
 
-
 class APIResponseCodes:
     created = 201
     ok = 200
     no_content = 204
     bad_request = 400
     not_found = 404
+    server_error = 500
 
 class ResponseGenerator:
 
@@ -61,26 +51,16 @@ class ResponseGenerator:
                 lobj_response_api = APIResponse(APIResponseCodes.ok, ldict_result, "Books extracted Successfully")
                 return lobj_response_api.get_response()
             else:
-                APIResponse.code = APIResponseCodes.no_content
-                APIResponse.response = {}
-                APIResponse.message = "No Book found"
+                lobj_response_api = APIResponse(APIResponseCodes.no_content, {}, "No Book found")
+                return lobj_response_api.get_response()
 
-                return APIResponse.__rep__()
         except Exception as e:
-            # logger.error(str(e), exc_info=True)
-            return self.get_default_response()
+            return self.get_error_response()
 
+    def get_error_response(self):
+        lobj_response_api = APIResponse(APIResponseCodes.server_error, {}, "Server Error")
+        return lobj_response_api.get_response()
 
-    def get_default_response(self):
-        APIResponse.code = APIResponseCodes.ok
-        APIResponse.response = {}
-        APIResponse.message = "Books extracted Successfully"
-
-        return APIResponse.__rep__()
-
-    def set_response(self, pint_code, pdict_response, pstr_msg):
-        APIResponse.code = pint_code
-        APIResponse.response = pdict_response
-        APIResponse.message = pstr_msg
-
-        return APIResponse.__rep__()
+    def get_bad_request_response(self):
+        lobj_response_api = APIResponse(APIResponseCodes.bad_request, {}, "'language' is missing request params")
+        return lobj_response_api.get_response()

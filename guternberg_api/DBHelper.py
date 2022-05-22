@@ -193,6 +193,7 @@ class DBHelper:
             # logger.error(str(e), exc_info=True)
         return llst_result
 
+
     def extract_subject_using_book_id(self, pint_bookid):
         llst_result = []
         try:
@@ -212,6 +213,7 @@ class DBHelper:
         except Exception as e:
             raise
         return llst_result
+
 
     def extract_language_using_book_id(self, pint_bookid):
         llst_result = []
@@ -234,6 +236,7 @@ class DBHelper:
             raise
         return llst_result
 
+
     def extract_bookshelf_using_book_id(self, pint_bookid):
         llst_result = []
         try:
@@ -254,6 +257,7 @@ class DBHelper:
         except Exception as e:
             raise
         return llst_result
+
 
     def extract_download_link_using_book_id(self, pint_bookid):
         llst_result = []
