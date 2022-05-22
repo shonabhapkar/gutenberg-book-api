@@ -13,7 +13,7 @@ class DBHelper:
             llst_result = lobj_session.query(
                         Book.id,Book.download_count
                     ).filter(
-                        Book.gutenberg_id.in_(self, ptup_gutenberg_id),
+                        Book.gutenberg_id.in_(ptup_gutenberg_id),
                     ).order_by(Book.download_count).all()
 
             llst_result = [lint_id for lint_id, _ in llst_result]
@@ -145,6 +145,25 @@ class DBHelper:
             raise
             # logger.error(str(e), exc_info=True)
         return llst_result
+
+
+    def extract_title_using_book_id(self, pint_bookid):
+        lstr_title = ""
+        try:
+            Session = sessionmaker(bind=engine)
+            lobj_session = Session()
+
+            lstr_title = lobj_session.query(
+                Book.title
+            ).filter(
+                Book.id == pint_bookid,
+            ).one()[0]
+
+
+        except Exception as e:
+            raise
+            # logger.error(str(e), exc_info=True)
+        return lstr_title
 
 
     def extract_author_info_using_book_id(self, pint_bookid):

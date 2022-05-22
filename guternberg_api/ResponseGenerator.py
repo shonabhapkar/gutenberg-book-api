@@ -1,15 +1,28 @@
 from guternberg_api.DBHelper import DBHelper
 
 
-class APIResponse:
-    message: str
-    code: int
-    response: {}
+# class APIResponse:
+#     message: str
+#     code: int
+#     response: {}
+#
+#     def get_response(self):
+#         return {"code": self.code,
+#                 "response": self.response,
+#                 "message": self.message}
 
-    def __rep__(self):
+class APIResponse:
+    def __init__(self, code, response, message):
+        self.message = message
+        self.code = code
+        self.response = response
+
+    def get_response(self):
         return {"code": self.code,
                 "response": self.response,
                 "message": self.message}
+
+
 
 class APIResponseCodes:
     created = 201
@@ -27,6 +40,8 @@ class ResponseGenerator:
 
             for lint_book_id in plst_book_id:
                 ldict_book_info = {}
+                ldict_book_info["title"] = \
+                    lobj_db_helper.extract_title_using_book_id(lint_book_id)
                 ldict_book_info["author_info"] = \
                     lobj_db_helper.extract_author_info_using_book_id(lint_book_id)
                 ldict_book_info["subject"] = \
@@ -43,11 +58,8 @@ class ResponseGenerator:
                 ldict_result = {"total_no_of_books": len(plst_book_id),
                                 "books": llst_books}
 
-                APIResponse.code = APIResponseCodes.ok
-                APIResponse.response = ldict_result
-                APIResponse.message = "Books extracted Successfully"
-
-                return APIResponse.__rep__()
+                lobj_response_api = APIResponse(APIResponseCodes.ok, ldict_result, "Books extracted Successfully")
+                return lobj_response_api.get_response()
             else:
                 APIResponse.code = APIResponseCodes.no_content
                 APIResponse.response = {}
@@ -63,5 +75,12 @@ class ResponseGenerator:
         APIResponse.code = APIResponseCodes.ok
         APIResponse.response = {}
         APIResponse.message = "Books extracted Successfully"
+
+        return APIResponse.__rep__()
+
+    def set_response(self, pint_code, pdict_response, pstr_msg):
+        APIResponse.code = pint_code
+        APIResponse.response = pdict_response
+        APIResponse.message = pstr_msg
 
         return APIResponse.__rep__()
