@@ -216,17 +216,17 @@ class BookInfoExtractor(Resource):
                     "request params are missing")
 
             # separate the input by ","
-            ltup_g_id = tuple(lstr_g_id.split(","))
-            ltup_lang = tuple(lstr_language.split(","))
-            ltup_mime_type = tuple(lstr_mime_type.split(","))
-            ltup_topic = tuple(lstr_topic.split(","))
-            ltup_author = tuple(lstr_author.split(","))
-            ltup_title = tuple(lstr_title.split(","))
+            ltup_g_id = tuple(lstr_g_id.split(",")) if lstr_g_id else None
+            ltup_lang = tuple(lstr_language.split(",")) if lstr_language else None
+            ltup_mime_type = tuple(lstr_mime_type.split(",")) if lstr_mime_type else None
+            ltup_topic = tuple(lstr_topic.split(",")) if lstr_topic else None
+            ltup_author = tuple(lstr_author.split(",")) if lstr_author else None
+            ltup_title = tuple(lstr_title.split(",")) if lstr_title else None
 
             # extract list of book id
             lobj_db_helper = DBHelper()
-            llst_book_id = DBHelper().extract_book(ltup_g_id, ltup_lang, ltup_mime_type,
-                                                   ltup_topic, ltup_author, ltup_title)
+            llst_book_id = lobj_db_helper.extract_book_id_by_multiple_criteria(
+                ltup_g_id, ltup_lang, ltup_mime_type, ltup_topic, ltup_author, ltup_title)
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
