@@ -4,7 +4,7 @@ from guternberg_api.logger import logger
 
 class APIHelper:
     """
-    This class uses DBHelper Class and performs db operations
+    It is the layer between API service function and DB operation function
     """
 
 

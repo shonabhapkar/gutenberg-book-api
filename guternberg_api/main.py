@@ -29,16 +29,17 @@ class BookInfoExtractorByGutenbergId(Resource):
             ltup_g_id = tuple(lstr_g_id.split(","))
 
             # extract list of book id
-            lobj_db_helper = DBHelper()
-            llst_book_id = lobj_db_helper.extract_book_id_by_gutenberg_id(ltup_g_id)
+            llst_book_id = DBHelper().extract_book_id_by_gutenberg_id(ltup_g_id)
+
+            # get total no of books found
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            lobj_api_helper = APIHelper()
-            llst_books = lobj_api_helper.get_books_info_by_book_id(
+            llst_books = APIHelper().get_books_info_by_book_id(
                 llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
+
             return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
                                                                        llst_books)
 
@@ -68,13 +69,13 @@ class BookInfoExtractorByLanguage(Resource):
             ltup_lang = tuple(lstr_language.split(","))
 
             # extract list of book id
-            lobj_db_helper = DBHelper()
             llst_book_id = DBHelper().extract_book_id_by_language(ltup_lang)
+
+            # get total no of books found
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            lobj_api_helper = APIHelper()
-            llst_books = lobj_api_helper.get_books_info_by_book_id(
+            llst_books = APIHelper().get_books_info_by_book_id(
                 llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
@@ -107,16 +108,18 @@ class BookInfoExtractorByMimeType(Resource):
             ltup_mime_type = tuple(lstr_mime_type.split(","))
 
             # extract list of book id
-            lobj_db_helper = DBHelper()
             llst_book_id = DBHelper().extract_book_id_by_mime_type(ltup_mime_type)
 
+            # get total no of books found
+            lint_total_no_of_books_found = len(llst_book_id)
+
             # extract books info
-            lobj_api_helper = APIHelper()
-            llst_books = lobj_api_helper.get_books_info_by_book_id(
+            llst_books = APIHelper().get_books_info_by_book_id(
                 llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
-            return ResponseGenerator().create_books_info_json_response(llst_books)
+            return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
+                                                                       llst_books)
 
         except Exception as e:
             logger.error(str(e), exc_info=True)
@@ -144,13 +147,13 @@ class BookInfoExtractorByTopic(Resource):
             ltup_topic = tuple(lstr_topic.split(","))
 
             # extract list of book id
-            lobj_db_helper = DBHelper()
             llst_book_id = DBHelper().extract_book_id_by_topic(ltup_topic)
+
+            # get total no of books found
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            lobj_api_helper = APIHelper()
-            llst_books = lobj_api_helper.get_books_info_by_book_id(
+            llst_books = APIHelper().get_books_info_by_book_id(
                 llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
@@ -182,14 +185,15 @@ class BookInfoExtractorByAuthor(Resource):
             ltup_author = tuple(lstr_author.split(","))
 
             # extract list of book id
-            lobj_db_helper = DBHelper()
             llst_book_id = DBHelper().extract_book_id_by_author(ltup_author)
+
+            # get total no of books found
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            lobj_api_helper = APIHelper()
-            llst_books = lobj_api_helper.get_books_info_by_book_id(
+            llst_books = APIHelper().get_books_info_by_book_id(
                 llst_book_id[:config.BOOKS_BATCH_SIZE])
+
 
             # create books_info json response
             return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
@@ -220,13 +224,13 @@ class BookInfoExtractorByTitle(Resource):
             ltup_title = tuple(lstr_title.split(","))
 
             # extract list of book id
-            lobj_db_helper = DBHelper()
             llst_book_id = DBHelper().extract_book_id_by_title(ltup_title)
+
+            # get total no of books found
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            lobj_api_helper = APIHelper()
-            llst_books = lobj_api_helper.get_books_info_by_book_id(
+            llst_books = APIHelper().get_books_info_by_book_id(
                 llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
@@ -279,6 +283,8 @@ class BookInfoExtractor(Resource):
             lobj_api_helper = APIHelper()
             llst_book_id = lobj_api_helper.extract_book_id_by_multiple_criteria(
                 ltup_g_id, ltup_lang, ltup_mime_type, ltup_topic, ltup_author, ltup_title)
+
+            # get total no of books found
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
