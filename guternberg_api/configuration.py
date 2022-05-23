@@ -15,7 +15,7 @@ try:
     # read Environment configurations
     DB_CONNECTION_URL = lobj_conf_parser.get("ENVIRONMENT", "DB_CONNECTION_URL")
     LOGGING_LEVEL = lobj_conf_parser.get("ENVIRONMENT", "LOGGING_LEVEL")
-    BOOKS_BATCH_COUNT = lobj_conf_parser.getint("ENVIRONMENT", "BOOKS_BATCH_COUNT")
+    BOOKS_BATCH_SIZE = lobj_conf_parser.getint("ENVIRONMENT", "BOOKS_BATCH_SIZE")
 
 except Exception as ex:
     raise

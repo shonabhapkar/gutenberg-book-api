@@ -30,7 +30,7 @@ class BookInfoExtractorByGutenbergId(Resource):
 
             # extract books info
             llst_books = lobj_db_helper.get_books_info_by_book_id(
-                llst_book_id[:config.BOOKS_BATCH_COUNT])
+                llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
             return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
@@ -62,7 +62,7 @@ class BookInfoExtractorByLanguage(Resource):
 
             # extract books info
             llst_books = lobj_db_helper.get_books_info_by_book_id(
-                llst_book_id[:config.BOOKS_BATCH_COUNT])
+                llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
             return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
@@ -123,7 +123,7 @@ class BookInfoExtractorByTopic(Resource):
 
             # extract books info
             llst_books = lobj_db_helper.get_books_info_by_book_id(
-                llst_book_id[:config.BOOKS_BATCH_COUNT])
+                llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
             return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
@@ -155,7 +155,7 @@ class BookInfoExtractorByAuthor(Resource):
 
             # extract books info
             llst_books = lobj_db_helper.get_books_info_by_book_id(
-                llst_book_id[:config.BOOKS_BATCH_COUNT])
+                llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
             return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
@@ -187,7 +187,7 @@ class BookInfoExtractorByTitle(Resource):
 
             # extract books info
             llst_books = lobj_db_helper.get_books_info_by_book_id(
-                llst_book_id[:config.BOOKS_BATCH_COUNT])
+                llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
             return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
@@ -231,7 +231,7 @@ class BookInfoExtractor(Resource):
 
             # extract books info
             llst_books = lobj_db_helper.get_books_info_by_book_id(
-                llst_book_id[:config.BOOKS_BATCH_COUNT])
+                llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
             return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,

@@ -79,6 +79,45 @@ class DBHelper:
         return llst_result
 
 
+    def extract_book_id_by_topic(self, ptup_topic):
+        llst_result = []
+        lobj_session = None
+        try:
+            lstr_regex = "|".join(ptup_topic)
+            Session = sessionmaker(bind=engine)
+            lobj_session = Session()
+
+            lstr_bookshelf_result = lobj_session.query(
+                Book.id, Book.download_count
+            ).filter(
+                Bookshelf.name.op('regexp')(lstr_regex),
+                Book.id == BookAndBookshelfMapper.book_id,
+                Bookshelf.id == BookAndBookshelfMapper.bookshelf_id,
+            )
+
+            lstr_book_subject_result = lobj_session.query(
+                Book.id, Book.download_count
+            ).filter(
+                Subject.name.op('regexp')(lstr_regex),
+                Book.id == BookAndSubjectMapper.book_id,
+                Subject.id == BookAndSubjectMapper.subject_id,
+            )
+
+            llst_result = lstr_bookshelf_result.union(
+                lstr_book_subject_result
+            ).order_by(Book.download_count).all()
+
+            llst_result = [lint_id for lint_id, _ in llst_result]
+
+        except Exception as e:
+            logger.error(str(e), extra={'ptup_topic': ptup_topic})
+            raise
+        finally:
+            if lobj_session:
+                lobj_session.close()
+        return llst_result
+
+
     def extract_book_id_by_author(self, ptup_author):
         llst_result = []
         lobj_session = None
@@ -132,43 +171,40 @@ class DBHelper:
         return llst_result
 
 
-    def extract_book_id_by_topic(self, ptup_topic):
-        llst_result = []
-        lobj_session = None
+    def extract_book_id_by_multiple_criteria(self, ptup_g_id, ptup_lang, ptup_mime_type,
+                                             ptup_topic, ptup_author, ptup_title):
+        llst_book_id = []
         try:
-            lstr_regex = "|".join(ptup_topic)
-            Session = sessionmaker(bind=engine)
-            lobj_session = Session()
+            if ptup_g_id:
+                # extract list of book ids by gutenberg_id criteria
+                llst_book_id.append(self.extract_book_id_by_gutenberg_id(ptup_g_id))
+            if ptup_lang:
+                # extract list of book ids by language criteria
+                llst_book_id.append(self.extract_book_id_by_language(ptup_lang))
+            if ptup_mime_type:
+                # extract list of book ids by mime_type criteria
+                llst_book_id.append(self.extract_book_id_by_mime_type(ptup_mime_type))
+            if ptup_topic:
+                # extract list of book ids by topic criteria
+                llst_book_id.append(self.extract_book_id_by_topic(ptup_topic))
+            if ptup_author:
+                # extract list of book ids by author criteria
+                llst_book_id.append(self.extract_book_id_by_author(ptup_author))
+            if ptup_title:
+                # extract list of book ids by title criteria
+                llst_book_id.append(self.extract_book_id_by_title(ptup_title))
 
-            lstr_bookshelf_result = lobj_session.query(
-                Book.id, Book.download_count
-            ).filter(
-                 Bookshelf.name.op('regexp')(lstr_regex),
-                 Book.id == BookAndBookshelfMapper.book_id,
-                 Bookshelf.id == BookAndBookshelfMapper.bookshelf_id,
-            )
+            # find the common book ids returned by all criteria
+            ltup_book_id = tuple(set.intersection(*map(set, llst_book_id)))
 
-            lstr_book_subject_result = lobj_session.query(
-                        Book.id, Book.download_count
-                ).filter(
-                        Subject.name.op('regexp')(lstr_regex),
-                        Book.id == BookAndSubjectMapper.book_id,
-                        Subject.id == BookAndSubjectMapper.subject_id,
-                )
-
-            llst_result = lstr_bookshelf_result.union(
-                        lstr_book_subject_result
-                ).order_by(Book.download_count).all()
-
-            llst_result = [lint_id for lint_id, _ in llst_result]
+            # sort the book ids by download count
+            llst_book_id = self.sort_book_id_by_download_count(ltup_book_id)
 
         except Exception as e:
-            logger.error(str(e), extra={'ptup_topic': ptup_topic})
+            logger.error(str(e), extra={'ptup_title': ptup_title})
             raise
-        finally:
-            if lobj_session:
-                lobj_session.close()
-        return llst_result
+
+        return llst_book_id
 
 
     def extract_title_using_book_id(self, pint_bookid):
@@ -226,33 +262,6 @@ class DBHelper:
         return llst_result
 
 
-    def extract_subject_using_book_id(self, pint_bookid):
-        llst_result = []
-        lobj_session = None
-        try:
-            Session = sessionmaker(bind=engine)
-            lobj_session = Session()
-            llst_subjects_result = lobj_session.query(
-                Subject
-            ).filter(
-                Book.id == BookAndSubjectMapper.book_id,
-                Subject.id == BookAndSubjectMapper.subject_id,
-            ).filter(
-                Book.id == pint_bookid,
-            ).all()
-
-            for lobj_row in llst_subjects_result:
-                llst_result.append(lobj_row.name)
-
-        except Exception as e:
-            logger.error(str(e), extra={'pint_bookid': pint_bookid},
-                         exc_info=True)
-        finally:
-            if lobj_session:
-                lobj_session.close()
-        return llst_result
-
-
     def extract_language_using_book_id(self, pint_bookid):
         llst_result = []
         lobj_session = None
@@ -270,6 +279,33 @@ class DBHelper:
 
             for lobj_row in llst_language_result:
                 llst_result.append(lobj_row.code)
+
+        except Exception as e:
+            logger.error(str(e), extra={'pint_bookid': pint_bookid},
+                         exc_info=True)
+        finally:
+            if lobj_session:
+                lobj_session.close()
+        return llst_result
+
+
+    def extract_subject_using_book_id(self, pint_bookid):
+        llst_result = []
+        lobj_session = None
+        try:
+            Session = sessionmaker(bind=engine)
+            lobj_session = Session()
+            llst_subjects_result = lobj_session.query(
+                Subject
+            ).filter(
+                Book.id == BookAndSubjectMapper.book_id,
+                Subject.id == BookAndSubjectMapper.subject_id,
+            ).filter(
+                Book.id == pint_bookid,
+            ).all()
+
+            for lobj_row in llst_subjects_result:
+                llst_result.append(lobj_row.name)
 
         except Exception as e:
             logger.error(str(e), extra={'pint_bookid': pint_bookid},
@@ -335,6 +371,7 @@ class DBHelper:
                 lobj_session.close()
         return llst_result
 
+
     def get_books_info_by_book_id(self, plst_book_id):
         llst_books = []
         try:
@@ -363,5 +400,28 @@ class DBHelper:
             raise
         finally:
             return llst_books
+
+
+    def sort_book_id_by_download_count(self, ptup_book_id):
+        llst_result = []
+        lobj_session = None
+        try:
+            Session = sessionmaker(bind=engine)
+            lobj_session = Session()
+            llst_result = lobj_session.query(
+                        Book.id, Book.download_count
+                    ).filter(
+                        Book.id.in_(ptup_book_id),
+                    ).order_by(Book.download_count).all()
+
+            llst_result = [lint_id for lint_id, _ in llst_result]
+
+        except Exception as e:
+            logger.error(str(e), extra={'ptup_book_id': ptup_book_id})
+            raise
+        finally:
+            if lobj_session:
+                lobj_session.close()
+        return llst_result
 
 
