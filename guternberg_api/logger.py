@@ -8,11 +8,11 @@ from guternberg_api.configuration import LOGGING_LEVEL
 try:
     logger = logging.getLogger(__name__)
 
-    lobj_logger_dir_path = './log/'
+    lobj_logger_dir_path = '.' + os.sep + 'log'
     mode = 0o777 | stat.S_IRUSR
     if not os.path.exists(lobj_logger_dir_path):
         os.makedirs(lobj_logger_dir_path, mode=0o777)
-    filepath = lobj_logger_dir_path + "/" + str(os.getcwd()).split('/')[-1] + "_log"
+    filepath = lobj_logger_dir_path + os.sep + str(os.getcwd()).split(os.sep)[-1] + "_log"
 
     handler = logging.handlers.TimedRotatingFileHandler(filename=filepath, when='midnight', backupCount=20)
 

@@ -1,8 +1,9 @@
 from sqlalchemy import Column, Integer, String, Text, create_engine
 from sqlalchemy.orm import declarative_base
+from guternberg_api import configuration as conf
 
 Base = declarative_base()
-engine = create_engine("mysql://root:admin@localhost/books", echo=True)
+engine = create_engine(conf.DB_CONNECTION_URL, echo=True)
 
 class Book(Base):
     __tablename__ = 'books_book'
