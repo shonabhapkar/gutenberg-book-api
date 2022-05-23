@@ -4,19 +4,34 @@ from guternberg_api.logger import logger
 
 
 class DBHelper:
+    """
+    This class uses HbmDal Class and performs db operations
+    """
 
     def extract_book_id_by_gutenberg_id(self, ptup_gutenberg_id):
-        llst_result = []
+        """
+        This method takes gutenberg_id tuple as input and extract book_ids (sorted by download counts) from db
+        by gutenberg_id criteria
+
+        :param ptup_gutenberg_id: It is tuple of gutenberg_ids
+        :return llst_result: It is a list of book_id sorted by download counts
+        """
+
         lobj_session = None
+
         try:
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
+
+            # extract tuple of Book_id and download_count (sorted by download counts) from db by gutenberg_id criteria
             llst_result = lobj_session.query(
                         Book.id, Book.download_count
                     ).filter(
                         Book.gutenberg_id.in_(ptup_gutenberg_id),
                     ).order_by(Book.download_count).all()
 
+            # get book_id
             llst_result = [lint_id for lint_id, _ in llst_result]
 
         except Exception as e:
@@ -29,12 +44,22 @@ class DBHelper:
 
 
     def extract_book_id_by_language(self, ptup_language):
+        """
+        This method takes language tuple as input and extract book_id (sorted by download counts) from db
+        by language criteria. Language criteria is case sensitive full match
+
+        :param ptup_language: It is tuple of language
+        :return llst_result: It is a list of book_id sorted by download counts
+        """
         llst_result = []
         lobj_session = None
         try:
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
 
+            # extract tuple of Book_id and download_count (sorted by download counts) from db by language criteria
+            # Language criteria is case sensitive full match
             llst_result = lobj_session.query(
                         Book.id, Book.download_count
                     ).filter(
@@ -43,6 +68,7 @@ class DBHelper:
                         Language.id == BookAndLanguageMapper.language_id,
                     ).order_by(Book.download_count).all()
 
+            # get book_id
             llst_result = [lint_id for lint_id, _ in llst_result]
 
         except Exception as e:
@@ -55,12 +81,22 @@ class DBHelper:
 
 
     def extract_book_id_by_mime_type(self, ptup_mime_type):
-        llst_result = []
+        """
+        This method takes mime_type tuple as input and extract book_ids (sorted by download counts) from db
+        by mime_type criteria. mime_type criteria is case sensitive full match
+
+        :param ptup_mime_type: It is tuple of mime_type
+        :return llst_result: It is a list of book_id sorted by download counts
+        """
+
         lobj_session = None
         try:
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
 
+            # extract tuple of Book_id and download_count (sorted by download counts) from db by mime_type criteria
+            # mime_type criteria is case sensitive full match
             llst_result = lobj_session.query(
                 Book.id, Book.download_count
             ).filter(
@@ -68,6 +104,7 @@ class DBHelper:
                 Book.id == Format.book_id,
             ).order_by(Book.download_count).all()
 
+            # get book_id
             llst_result = [lint_id for lint_id, _ in llst_result]
 
         except Exception as e:
@@ -80,13 +117,26 @@ class DBHelper:
 
 
     def extract_book_id_by_topic(self, ptup_topic):
-        llst_result = []
+        """
+        This method takes mime_type tuple as input and extract book_ids (sorted by download counts) from db
+        by topic criteria. Topic is filter on either ‘subject’ or ‘bookshelf’ or both.
+        topic criteria is case-insensitive partial match
+
+        :param ptup_topic: It is tuple of topic
+        :return llst_result: It is a list of book_id sorted by download counts
+        """
+
         lobj_session = None
         try:
+            # create topic regex for case-insensitive partial match
             lstr_regex = "|".join(ptup_topic)
+
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
 
+            # create qurey to extract list of Book objets from db by bookshelf criteria
+            # bookshelf criteria is case-insensitive partial match
             lstr_bookshelf_result = lobj_session.query(
                 Book.id, Book.download_count
             ).filter(
@@ -95,6 +145,8 @@ class DBHelper:
                 Bookshelf.id == BookAndBookshelfMapper.bookshelf_id,
             )
 
+            # create qurey to extract list of Book objets from db by subject criteria
+            # subject criteria is case-insensitive partial match
             lstr_book_subject_result = lobj_session.query(
                 Book.id, Book.download_count
             ).filter(
@@ -103,10 +155,13 @@ class DBHelper:
                 Subject.id == BookAndSubjectMapper.subject_id,
             )
 
+            # extract tuple of Book_id and download_count (sorted by download counts) from db
+            # by topic criteria (taking union of subject and bookshelf queries)
             llst_result = lstr_bookshelf_result.union(
                 lstr_book_subject_result
             ).order_by(Book.download_count).all()
 
+            # get book_id
             llst_result = [lint_id for lint_id, _ in llst_result]
 
         except Exception as e:
@@ -119,13 +174,25 @@ class DBHelper:
 
 
     def extract_book_id_by_author(self, ptup_author):
-        llst_result = []
+        """
+        This method takes mime_type tuple as input and extract book_ids (sorted by download counts) from db
+        by author criteria. mime_type criteria is case-insensitive partial match
+
+        :param ptup_author: It is tuple of author
+        :return llst_result: It is a list of book_id sorted by download counts
+        """
+
         lobj_session = None
         try:
+            # create author regex for case-insensitive partial match
             lstr_regex = "|".join(ptup_author)
+
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
 
+            # extract tuple of Book_id and download_count (sorted by download counts) from db by author criteria
+            # author criteria is case-insensitive partial match
             llst_result = lobj_session.query(
                 Book.id, Book.download_count
             ).filter(
@@ -135,6 +202,7 @@ class DBHelper:
                 Author.name.op('regexp')(lstr_regex)
             ).order_by(Book.download_count).all()
 
+            # get book_id
             llst_result = [lint_id for lint_id, _ in llst_result]
 
         except Exception as e:
@@ -147,19 +215,31 @@ class DBHelper:
 
 
     def extract_book_id_by_title(self, ptup_title):
-        llst_result = []
+        """
+        This method takes title tuple as input and extract book_ids (sorted by download counts) from db
+        by author criteria. mime_type criteria is case-insensitive partial match
+
+        :param ptup_author: It is tuple of author
+        :return llst_result: It is a list of book_id sorted by download counts
+        """
         lobj_session = None
         try:
+            # create title regex for case-insensitive partial match
             lstr_regex = "|".join(ptup_title)
+
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
 
+            # extract tuple of Book_id and download_count (sorted by download counts) from db by title criteria
+            # title criteria is case-insensitive partial match
             llst_result = lobj_session.query(
                 Book.id, Book.download_count
             ).filter(
                 Book.title.op('regexp')(lstr_regex)
             ).order_by(Book.download_count).all()
 
+            # get book_id
             llst_result = [lint_id for lint_id, _ in llst_result]
 
         except Exception as e:
@@ -171,49 +251,21 @@ class DBHelper:
         return llst_result
 
 
-    def extract_book_id_by_multiple_criteria(self, ptup_g_id, ptup_lang, ptup_mime_type,
-                                             ptup_topic, ptup_author, ptup_title):
-        llst_book_id = []
-        try:
-            if ptup_g_id:
-                # extract list of book ids by gutenberg_id criteria
-                llst_book_id.append(self.extract_book_id_by_gutenberg_id(ptup_g_id))
-            if ptup_lang:
-                # extract list of book ids by language criteria
-                llst_book_id.append(self.extract_book_id_by_language(ptup_lang))
-            if ptup_mime_type:
-                # extract list of book ids by mime_type criteria
-                llst_book_id.append(self.extract_book_id_by_mime_type(ptup_mime_type))
-            if ptup_topic:
-                # extract list of book ids by topic criteria
-                llst_book_id.append(self.extract_book_id_by_topic(ptup_topic))
-            if ptup_author:
-                # extract list of book ids by author criteria
-                llst_book_id.append(self.extract_book_id_by_author(ptup_author))
-            if ptup_title:
-                # extract list of book ids by title criteria
-                llst_book_id.append(self.extract_book_id_by_title(ptup_title))
-
-            # find the common book ids returned by all criteria
-            ltup_book_id = tuple(set.intersection(*map(set, llst_book_id)))
-
-            # sort the book ids by download count
-            llst_book_id = self.sort_book_id_by_download_count(ltup_book_id)
-
-        except Exception as e:
-            logger.error(str(e), extra={'ptup_title': ptup_title})
-            raise
-
-        return llst_book_id
-
-
     def extract_title_using_book_id(self, pint_bookid):
+        """
+        This method takes book_id as input and extract title from db
+
+        :param pint_bookid: It is book id
+        :return lstr_title: It is title
+        """
         lstr_title = ""
         lobj_session = None
         try:
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
 
+            # extract tile from db by book id criteria
             lstr_title = lobj_session.query(
                 Book.title
             ).filter(
@@ -231,12 +283,21 @@ class DBHelper:
 
 
     def extract_author_info_using_book_id(self, pint_bookid):
+        """
+        This method takes book_id as input and extract author_info from db
+
+        :param pint_bookid: It is book id
+        :return llst_result: It is list of author
+        """
+
         llst_result = []
         lobj_session = None
         try:
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
 
+            # extract list of Author objects from db by book id criteria
             llst_author_result = lobj_session.query(
                 Author
             ).filter(
@@ -246,6 +307,7 @@ class DBHelper:
                 Book.id == pint_bookid,
             ).all()
 
+            # create list of author info
             for lobj_row in llst_author_result:
                 ldict_row_result = {}
                 ldict_row_result["name"] = lobj_row.name
@@ -263,11 +325,21 @@ class DBHelper:
 
 
     def extract_language_using_book_id(self, pint_bookid):
+        """
+        This method takes book_id as input and extract languages from db
+
+        :param pint_bookid: It is book id
+        :return llst_result: It is list of language
+        """
+
         llst_result = []
         lobj_session = None
         try:
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
+
+            # extract list of Language objects from db by book id criteria
             llst_language_result = lobj_session.query(
                 Language
             ).filter(
@@ -277,6 +349,7 @@ class DBHelper:
                 Book.id == pint_bookid,
             ).all()
 
+            # create list of subject
             for lobj_row in llst_language_result:
                 llst_result.append(lobj_row.code)
 
@@ -290,11 +363,21 @@ class DBHelper:
 
 
     def extract_subject_using_book_id(self, pint_bookid):
+        """
+        This method takes book_id as input and extract subject from db
+
+        :param pint_bookid: It is book id
+        :return llst_result: It is list of subject
+        """
+
         llst_result = []
         lobj_session = None
         try:
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
+
+            # extract list of Subject objects from db by book id criteria
             llst_subjects_result = lobj_session.query(
                 Subject
             ).filter(
@@ -304,6 +387,7 @@ class DBHelper:
                 Book.id == pint_bookid,
             ).all()
 
+            # create list of subject
             for lobj_row in llst_subjects_result:
                 llst_result.append(lobj_row.name)
 
@@ -317,11 +401,21 @@ class DBHelper:
 
 
     def extract_bookshelf_using_book_id(self, pint_bookid):
+        """
+        This method takes book_id as input and extract bookshelf name from db
+
+        :param pint_bookid: It is book id
+        :return llst_result: It is list of bookshelf name
+        """
+
         llst_result = []
         lobj_session = None
         try:
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
+
+            # extract list of Bookshelf objects from db by book id criteria
             llst_bookshelf_result = lobj_session.query(
                 Bookshelf
             ).filter(
@@ -331,6 +425,7 @@ class DBHelper:
                 Book.id == pint_bookid,
             ).all()
 
+            # create list of bookshelf
             for lobj_row in llst_bookshelf_result:
                 llst_result.append(lobj_row.name)
 
@@ -344,11 +439,21 @@ class DBHelper:
 
 
     def extract_download_link_using_book_id(self, pint_bookid):
+        """
+        This method takes book_id as input and extract download_link info from db
+
+        :param pint_bookid: It is book id
+        :return llst_result: It is list of download_link info
+        """
+
         llst_result = []
         lobj_session= None
         try:
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
+
+            # extract list of Format objects from db by book id criteria
             llst_format_result = lobj_session.query(
                 Format
             ).filter(
@@ -357,6 +462,7 @@ class DBHelper:
                 Book.id == pint_bookid,
             ).all()
 
+            # create list of download link info
             for lobj_row in llst_format_result:
                 ldict_row_result = {}
                 ldict_row_result["mime_type"] = lobj_row.mime_type
@@ -372,48 +478,28 @@ class DBHelper:
         return llst_result
 
 
-    def get_books_info_by_book_id(self, plst_book_id):
-        llst_books = []
-        try:
-            lobj_db_helper = DBHelper()
-
-            for lint_book_id in plst_book_id:
-                ldict_book_info = {}
-
-                ldict_book_info["title"] = \
-                    lobj_db_helper.extract_title_using_book_id(lint_book_id)
-                ldict_book_info["author_info"] = \
-                    lobj_db_helper.extract_author_info_using_book_id(lint_book_id)
-                ldict_book_info["subject"] = \
-                    lobj_db_helper.extract_subject_using_book_id(lint_book_id)
-                ldict_book_info["language"] = \
-                    lobj_db_helper.extract_language_using_book_id(lint_book_id)
-                ldict_book_info["bookself"] = \
-                    lobj_db_helper.extract_bookshelf_using_book_id(lint_book_id)
-                ldict_book_info["download_link"] = \
-                    lobj_db_helper.extract_download_link_using_book_id(lint_book_id)
-
-                llst_books.append(ldict_book_info)
-
-        except Exception as e:
-            logger.error(str(e), extra={'plst_book_id': plst_book_id})
-            raise
-        finally:
-            return llst_books
-
-
     def sort_book_id_by_download_count(self, ptup_book_id):
-        llst_result = []
+        """
+        This method takes book_id tuple as input and sort book_id by download_count
+
+        :param ptup_book_id: It is book id tuple
+        :return llst_result: It is list of Books id sorted by download count
+        """
+
         lobj_session = None
         try:
+            # create session
             Session = sessionmaker(bind=engine)
             lobj_session = Session()
+
+            #  sort book_id by download_count
             llst_result = lobj_session.query(
                         Book.id, Book.download_count
                     ).filter(
                         Book.id.in_(ptup_book_id),
                     ).order_by(Book.download_count).all()
 
+            # create list of book id
             llst_result = [lint_id for lint_id, _ in llst_result]
 
         except Exception as e:

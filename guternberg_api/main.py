@@ -1,3 +1,4 @@
+from guternberg_api.APIHelper import APIHelper
 from guternberg_api.DBHelper import DBHelper
 from flask import Flask, request
 from flask_restful import Resource, Api
@@ -10,6 +11,10 @@ api = Api(app)
 
 
 class BookInfoExtractorByGutenbergId(Resource):
+    """
+    This API retrieve the Book info filtered by provided gutenberg_id
+    This API allows multiple filter values eg.. g_id=3,4
+    """
     def get(self):
 
         try:
@@ -29,7 +34,8 @@ class BookInfoExtractorByGutenbergId(Resource):
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(
+            lobj_api_helper = APIHelper()
+            llst_books = lobj_api_helper.get_books_info_by_book_id(
                 llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
@@ -42,6 +48,12 @@ class BookInfoExtractorByGutenbergId(Resource):
 
 
 class BookInfoExtractorByLanguage(Resource):
+    """
+    This API retrieve the Book info filtered by provided language
+    This API allows multiple filter values eg.. lang=eng,la
+    This API provides case sensitive full match
+    This API does not allow case insensitive partial match
+    """
     def get(self):
 
         try:
@@ -61,7 +73,8 @@ class BookInfoExtractorByLanguage(Resource):
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(
+            lobj_api_helper = APIHelper()
+            llst_books = lobj_api_helper.get_books_info_by_book_id(
                 llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
@@ -74,6 +87,12 @@ class BookInfoExtractorByLanguage(Resource):
 
 
 class BookInfoExtractorByMimeType(Resource):
+    """
+    This API retrieve the Book info filtered by provided mime_type
+    This API allows multiple filter values eg.. mime_type=text/plain,application/prs.tex
+    This API provides case sensitive full match
+    This API does not allow case insensitive partial match
+    """
     def get(self):
 
         try:
@@ -92,7 +111,9 @@ class BookInfoExtractorByMimeType(Resource):
             llst_book_id = DBHelper().extract_book_id_by_mime_type(ltup_mime_type)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(llst_book_id)
+            lobj_api_helper = APIHelper()
+            llst_books = lobj_api_helper.get_books_info_by_book_id(
+                llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
             return ResponseGenerator().create_books_info_json_response(llst_books)
@@ -103,6 +124,12 @@ class BookInfoExtractorByMimeType(Resource):
 
 
 class BookInfoExtractorByTopic(Resource):
+    """
+    This API retrieve the Book info filtered by provided topic
+    This API allows multiple filter values eg.. topic=child,infant
+    Topic is filter on either ‘subject’ or ‘bookshelf’ or both.
+    Case insensitive partial matches are supported.
+    """
     def get(self):
 
         try:
@@ -122,7 +149,8 @@ class BookInfoExtractorByTopic(Resource):
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(
+            lobj_api_helper = APIHelper()
+            llst_books = lobj_api_helper.get_books_info_by_book_id(
                 llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
@@ -135,6 +163,11 @@ class BookInfoExtractorByTopic(Resource):
 
 
 class BookInfoExtractorByAuthor(Resource):
+    """
+    This API retrieve the Book info filtered by provided author
+    This API allows multiple filter values eg.. author=Jefferson,Henry
+    Case insensitive partial matches are supported.
+    """
     def get(self):
 
         try:
@@ -154,7 +187,8 @@ class BookInfoExtractorByAuthor(Resource):
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(
+            lobj_api_helper = APIHelper()
+            llst_books = lobj_api_helper.get_books_info_by_book_id(
                 llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
@@ -167,6 +201,11 @@ class BookInfoExtractorByAuthor(Resource):
 
 
 class BookInfoExtractorByTitle(Resource):
+    """
+    This API retrieve the Book info filtered by provided title
+    This API allows multiple filter values eg.. title=slavery,history
+    Case insensitive partial matches are supported.
+    """
     def get(self):
 
         try:
@@ -186,7 +225,8 @@ class BookInfoExtractorByTitle(Resource):
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(
+            lobj_api_helper = APIHelper()
+            llst_books = lobj_api_helper.get_books_info_by_book_id(
                 llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
@@ -199,6 +239,18 @@ class BookInfoExtractorByTitle(Resource):
 
 
 class BookInfoExtractor(Resource):
+    """
+    This API retrieve the Book info filtered by all provided criteria
+    This API allows multiple filter values for each criteria
+    This API can be called with one or more than one criteria mentioned below
+     a) g_id=3,4
+     b) lang=eng,la
+     c) mime_type=text/plain,application/prs.tex
+     d) topic=child,infant
+     e) author=Jefferson,Henry
+     d) title=slavery,history
+    Here only Author, Title and topic supports case insensitive partial match
+    """
     def get(self):
 
         try:
@@ -224,13 +276,13 @@ class BookInfoExtractor(Resource):
             ltup_title = tuple(lstr_title.split(",")) if lstr_title else None
 
             # extract list of book id
-            lobj_db_helper = DBHelper()
-            llst_book_id = lobj_db_helper.extract_book_id_by_multiple_criteria(
+            lobj_api_helper = APIHelper()
+            llst_book_id = lobj_api_helper.extract_book_id_by_multiple_criteria(
                 ltup_g_id, ltup_lang, ltup_mime_type, ltup_topic, ltup_author, ltup_title)
             lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(
+            llst_books = lobj_api_helper.get_books_info_by_book_id(
                 llst_book_id[:config.BOOKS_BATCH_SIZE])
 
             # create books_info json response
@@ -241,7 +293,7 @@ class BookInfoExtractor(Resource):
             logger.error(str(e), exc_info=True)
             return ResponseGenerator().get_error_response()
 
-
+# register all API
 api.add_resource(BookInfoExtractorByGutenbergId, '/guternberg_api/get_books_by_g_id')
 api.add_resource(BookInfoExtractorByLanguage, '/guternberg_api/get_books_by_lang')
 api.add_resource(BookInfoExtractorByMimeType, '/guternberg_api/get_books_by_mime_type')
