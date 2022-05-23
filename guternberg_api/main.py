@@ -309,4 +309,4 @@ api.add_resource(BookInfoExtractorByTitle, '/guternberg_api/get_books_by_title')
 api.add_resource(BookInfoExtractor, '/guternberg_api/get_books')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
