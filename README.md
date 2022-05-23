@@ -71,13 +71,13 @@ Guternberg API retrieves only 25 books at a time
 
 ### This library provides following APIs
 
-###### 1. http://host:port/guternberg_api/get_books_by_g_id?g_id=3,4
+###### 1. /guternberg_api/get_books_by_g_id?g_id=3,4
 ```text
 - This API retrieve the Book info filtered by provided gutenberg_id
 - This API allows multiple filter values eg.. g_id=3,4
 ```
 
-###### 2. http://host:port/guternberg_api/get_books_by_lang?lang=eng,la
+###### 2. /guternberg_api/get_books_by_lang?lang=eng,la
 ```text
 - This API retrieve the Book info filtered by provided language
 - This API allows multiple filter values eg.. lang=eng,la
@@ -85,7 +85,7 @@ Guternberg API retrieves only 25 books at a time
 - This API does not allow case insensitive partial match
 ```
 
-###### 3. http://host:port/guternberg_api/get_books_by_mime_type?mime_type=text/plain,application/prs.tex
+###### 3. /guternberg_api/get_books_by_mime_type?mime_type=text/plain,application/prs.tex
 ```text
 - This API retrieve the Book info filtered by provided mime_type
 - This API allows multiple filter values eg.. mime_type=text/plain,application/prs.tex
@@ -93,7 +93,7 @@ Guternberg API retrieves only 25 books at a time
 - It does not allow case insensitive partial match
 ```
 
-###### 4. http://host:port/guternberg_api/get_books_by_topic?topic=child,infant
+###### 4. /guternberg_api/get_books_by_topic?topic=child,infant
 ```text
 - This API retrieve the Book info filtered by provided topic
 - This API allows multiple filter values eg.. topic=child,infant
@@ -101,21 +101,21 @@ Guternberg API retrieves only 25 books at a time
 - Case insensitive partial matches are supported.
 ```
 
-###### 5. http://host:port/guternberg_api/get_books_by_author?author=Jefferson,Henry
+###### 5. /guternberg_api/get_books_by_author?author=Jefferson,Henry
 ```text
 - This API retrieve the Book info filtered by provided author
 - This API allows multiple filter values eg.. author=Jefferson,Henry
 - Case insensitive partial matches are supported.
 ```
 
-###### 6. http://host:port/guternberg_api/get_books_by_title?title=slavery,history
+###### 6. /guternberg_api/get_books_by_title?title=slavery,history
 ```text
 - This API retrieve the Book info filtered by provided title
 - This API allows multiple filter values eg.. title=slavery,history
 - Case insensitive partial matches are supported.
 ```
 
-###### 7. http://host:port/guternberg_api/get_books?lang=eng,la&topic=child,infant
+###### 7. /guternberg_api/get_books?lang=eng,la&topic=child,infant
 ```text
 - This API retrieve the Book info filtered by all provided criteria
 - This API allows multiple filter values for each criteria
