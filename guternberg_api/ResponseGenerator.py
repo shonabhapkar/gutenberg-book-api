@@ -23,10 +23,10 @@ class APIResponseCodes:
 
 class ResponseGenerator:
 
-    def create_books_info_json_response(self, plst_books):
+    def create_books_info_json_response(self, pint_total_no_of_books_found, plst_books):
         try:
             if plst_books:
-                ldict_result = {"total_no_of_books": len(plst_books),
+                ldict_result = {"total_no_of_books": pint_total_no_of_books_found,
                                 "books": plst_books}
 
                 lobj_response_api = APIResponse(APIResponseCodes.ok, ldict_result,

@@ -1,7 +1,6 @@
 from guternberg_api.HbmDal import *
 from sqlalchemy.orm import sessionmaker
 from guternberg_api.logger import logger
-from guternberg_api import configuration as config
 
 
 class DBHelper:
@@ -42,7 +41,7 @@ class DBHelper:
                         Language.code.in_(ptup_language),
                         Book.id == BookAndLanguageMapper.book_id,
                         Language.id == BookAndLanguageMapper.language_id,
-                    ).order_by(Book.download_count).limit(config.BOOKS_BATCH_COUNT).all()
+                    ).order_by(Book.download_count).all()
 
             llst_result = [lint_id for lint_id, _ in llst_result]
 
@@ -67,7 +66,7 @@ class DBHelper:
             ).filter(
                 Format.mime_type.in_(ptup_mime_type),
                 Book.id == Format.book_id,
-            ).order_by(Book.download_count).limit(config.BOOKS_BATCH_COUNT).all()
+            ).order_by(Book.download_count).all()
 
             llst_result = [lint_id for lint_id, _ in llst_result]
 
@@ -95,7 +94,7 @@ class DBHelper:
                 Author.id == BookAndAuthorMapper.author_id,
             ) .filter(
                 Author.name.op('regexp')(lstr_regex)
-            ).order_by(Book.download_count).limit(config.BOOKS_BATCH_COUNT).all()
+            ).order_by(Book.download_count).all()
 
             llst_result = [lint_id for lint_id, _ in llst_result]
 
@@ -120,7 +119,7 @@ class DBHelper:
                 Book.id, Book.download_count
             ).filter(
                 Book.title.op('regexp')(lstr_regex)
-            ).order_by(Book.download_count).limit(config.BOOKS_BATCH_COUNT).all()
+            ).order_by(Book.download_count).all()
 
             llst_result = [lint_id for lint_id, _ in llst_result]
 
@@ -159,7 +158,7 @@ class DBHelper:
 
             llst_result = lstr_bookshelf_result.union(
                         lstr_book_subject_result
-                ).order_by(Book.download_count).limit(config.BOOKS_BATCH_COUNT).all()
+                ).order_by(Book.download_count).all()
 
             llst_result = [lint_id for lint_id, _ in llst_result]
 

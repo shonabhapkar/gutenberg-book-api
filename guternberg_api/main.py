@@ -3,6 +3,7 @@ from flask import Flask, request
 from flask_restful import Resource, Api
 from guternberg_api.ResponseGenerator import ResponseGenerator
 from guternberg_api.logger import logger
+from guternberg_api import configuration as config
 
 app = Flask(__name__)
 api = Api(app)
@@ -25,12 +26,15 @@ class BookInfoExtractorByGutenbergId(Resource):
             # extract list of book id
             lobj_db_helper = DBHelper()
             llst_book_id = lobj_db_helper.extract_book_id_by_gutenberg_id(ltup_g_id)
+            lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(llst_book_id)
+            llst_books = lobj_db_helper.get_books_info_by_book_id(
+                llst_book_id[:config.BOOKS_BATCH_COUNT])
 
             # create books_info json response
-            return ResponseGenerator().create_books_info_json_response(llst_books)
+            return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
+                                                                       llst_books)
 
         except Exception as e:
             logger.error(str(e), exc_info=True)
@@ -54,12 +58,15 @@ class BookInfoExtractorByLanguage(Resource):
             # extract list of book id
             lobj_db_helper = DBHelper()
             llst_book_id = DBHelper().extract_book_id_by_language(ltup_lang)
+            lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(llst_book_id)
+            llst_books = lobj_db_helper.get_books_info_by_book_id(
+                llst_book_id[:config.BOOKS_BATCH_COUNT])
 
             # create books_info json response
-            return ResponseGenerator().create_books_info_json_response(llst_books)
+            return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
+                                                                       llst_books)
 
         except Exception as e:
             logger.error(str(e), exc_info=True)
@@ -112,12 +119,15 @@ class BookInfoExtractorByTopic(Resource):
             # extract list of book id
             lobj_db_helper = DBHelper()
             llst_book_id = DBHelper().extract_book_id_by_topic(ltup_topic)
+            lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(llst_book_id)
+            llst_books = lobj_db_helper.get_books_info_by_book_id(
+                llst_book_id[:config.BOOKS_BATCH_COUNT])
 
             # create books_info json response
-            return ResponseGenerator().create_books_info_json_response(llst_books)
+            return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
+                                                                       llst_books)
 
         except Exception as e:
             logger.error(str(e), exc_info=True)
@@ -141,12 +151,15 @@ class BookInfoExtractorByAuthor(Resource):
             # extract list of book id
             lobj_db_helper = DBHelper()
             llst_book_id = DBHelper().extract_book_id_by_author(ltup_author)
+            lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(llst_book_id)
+            llst_books = lobj_db_helper.get_books_info_by_book_id(
+                llst_book_id[:config.BOOKS_BATCH_COUNT])
 
             # create books_info json response
-            return ResponseGenerator().create_books_info_json_response(llst_books)
+            return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
+                                                                       llst_books)
 
         except Exception as e:
             logger.error(str(e), exc_info=True)
@@ -170,12 +183,15 @@ class BookInfoExtractorByTitle(Resource):
             # extract list of book id
             lobj_db_helper = DBHelper()
             llst_book_id = DBHelper().extract_book_id_by_title(ltup_title)
+            lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(llst_book_id)
+            llst_books = lobj_db_helper.get_books_info_by_book_id(
+                llst_book_id[:config.BOOKS_BATCH_COUNT])
 
             # create books_info json response
-            return ResponseGenerator().create_books_info_json_response(llst_books)
+            return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
+                                                                       llst_books)
 
         except Exception as e:
             logger.error(str(e), exc_info=True)
@@ -211,12 +227,15 @@ class BookInfoExtractor(Resource):
             lobj_db_helper = DBHelper()
             llst_book_id = DBHelper().extract_book(ltup_g_id, ltup_lang, ltup_mime_type,
                                                    ltup_topic, ltup_author, ltup_title)
+            lint_total_no_of_books_found = len(llst_book_id)
 
             # extract books info
-            llst_books = lobj_db_helper.get_books_info_by_book_id(llst_book_id)
+            llst_books = lobj_db_helper.get_books_info_by_book_id(
+                llst_book_id[:config.BOOKS_BATCH_COUNT])
 
             # create books_info json response
-            return ResponseGenerator().create_books_info_json_response(llst_books)
+            return ResponseGenerator().create_books_info_json_response(lint_total_no_of_books_found,
+                                                                       llst_books)
 
         except Exception as e:
             logger.error(str(e), exc_info=True)
