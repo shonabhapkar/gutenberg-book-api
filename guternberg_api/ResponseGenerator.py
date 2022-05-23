@@ -1,5 +1,5 @@
-from guternberg_api.DBHelper import DBHelper
 from guternberg_api.logger import logger
+
 
 class APIResponse:
     def __init__(self, code, response, message):
@@ -8,7 +8,7 @@ class APIResponse:
         self.response = response
 
     def get_response(self):
-        return {"code": self.code,
+        return {"status_code": self.code,
                 "response": self.response,
                 "message": self.message}
 
@@ -26,7 +26,8 @@ class ResponseGenerator:
     def create_books_info_json_response(self, pint_total_no_of_books_found, plst_books):
         try:
             if plst_books:
-                ldict_result = {"total_no_of_books": pint_total_no_of_books_found,
+                ldict_result = {"total_no_of_books_available": pint_total_no_of_books_found,
+                                "retrieved_book_count": len(plst_books),
                                 "books": plst_books}
 
                 lobj_response_api = APIResponse(APIResponseCodes.ok, ldict_result,
